@@ -1,50 +1,43 @@
+require('dotenv').config({
+  path: './tests/.env'
+});
 const glob = require('glob-promise');
 const createTestCafe = require('testcafe');
-
-const DESKTOP_BROWSERS = [
-  'browserstack:safari',
-  'browserstack:edge@15.0:Windows 10',
-  'browserstack:ie',
-  'browserstack:chrome',
-  'browserstack:firefox'
-];
-
-const MOBILE_BROWSERS = [
-  'browserstack:iPhone 6S@12',
-  'browserstack:Google Pixel 2@9.0'
-];
+const browsers = require('./config/browsers');
 
 async function createTestCafeInstance(browsers, testFiles) {
-  let testcafe;
+  let testCafe;
   await createTestCafe()
-    .then(tc => {
-      testcafe = tc;
-      return testcafe
+    .then(testCafeInstance => {
+      testCafe = testCafeInstance;
+      return testCafe
         .createRunner()
         .src(testFiles)
         .browsers(browsers)
-        .run();
+        .run({
+          skipJsErrors: true
+        });
     })
     .then(() => {
-      testcafe.close();
+      testCafe.close();
     })
-    .catch(err => console.error(err));
+    .catch(error => console.error(error));
 }
 
-async function getFiles(pattern) {
+async function getScenarioFiles(pattern) {
   return await glob(pattern)
     .then(files => files)
-    .catch(e => console.error(e));
+    .catch(error => console.error(error));
 }
 
 async function startTests(browsers, createTestCafeInstance, mobile = false) {
   const folder = mobile ? 'mobile' : 'desktop';
-  let files = await getFiles(`tests/scenarios/${folder}/*.js`);
+  const scenarioFiles = await getScenarioFiles(`tests/scenarios/${folder}/*.js`);
 
   for (let index = 0; index < browsers.length; index++) {
-    await createTestCafeInstance(browsers[index], files)
+    await createTestCafeInstance(browsers[index], scenarioFiles)
   }
 }
 
-startTests(DESKTOP_BROWSERS, createTestCafeInstance)
-  .then(() => startTests(MOBILE_BROWSERS, createTestCafeInstance, true));
+startTests(browsers.desktop, createTestCafeInstance)
+  .then(() => startTests(browsers.mobile, createTestCafeInstance, true));

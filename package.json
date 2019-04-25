@@ -1,17 +1,18 @@
 {
   "name": "poc_testcafe",
   "version": "1.0.0",
-  "description": "Test testcafe",
-  "main": "index.js",
-  "dependencies": {
+  "description": "POC - BrowserStack and TestCafe",
+  "main": "tests/acceptance.js",
+  "dependencies": {},
+  "devDependencies": {
+    "dotenv": "^7.0.0",
+    "glob": "^7.1.3",
     "glob-promise": "^3.4.0",
     "testcafe": "^1.1.3",
     "testcafe-browser-provider-browserstack": "^1.8.0"
   },
-  "devDependencies": {},
   "scripts": {
-    "test": "node 'tests/acceptance.js'",
-    "testLocal": "testcafe safari 'tests/scenarios/*.js'",
+    "test": "node tests/acceptance.js",
     "browsers": "testcafe -b browserstack"
   },
   "author": "Sarah Vrielinck",
